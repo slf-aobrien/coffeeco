@@ -14,7 +14,7 @@ import (
 var ErrNoDiscount = errors.New("no discount for store")
 
 type Repository interface {
-	GetStoreDiscount(ctx context.Context, storeId uuid.UUID) (int, error)
+	GetStoreDiscount(ctx context.Context, storeId uuid.UUID) (float32, error)
 	Ping(ctx context.Context) error
 }
 
@@ -41,8 +41,8 @@ func NewMongoRepo(ctx context.Context, connectionString string) (*MongoRepositor
 }
 
 func (m MongoRepository) GetStoreDiscount(ctx context.Context, storeId uuid.UUID) (float32, error) {
-	var discount int64
-	if err := m.storeDiscounts.FindOne(ctx, bson.D{{"store_id", storeID.String()}}).Decode(&discount); err != nil {
+	var discount float32
+	if err := m.storeDiscounts.FindOne(ctx, bson.D{{"store_id", storeId.String()}}).Decode(&discount); err != nil {
 		if err == mongo.ErrNoDocuments {
 			// This error means your query did not match any documents.
 			return 0, ErrNoDiscount

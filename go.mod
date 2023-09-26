@@ -1,4 +1,4 @@
-module github.com/obriena/coffeeco
+module github.com/slf-aobrien/coffeeco
 
 go 1.20
 
