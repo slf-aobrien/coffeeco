@@ -1,7 +1,7 @@
 package store
 
 import (
-	coffeeco "coffeeco/internal"
+	coffeeco "github.com/slf-aobrien/coffeeco/internal"
 	"context"
 	"github.com/google/uuid"
 )

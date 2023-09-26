@@ -7,8 +7,8 @@ import (
 
 	"github.com/google/uuid"
 
-	coffeeco "coffeeco/internal"
-	"coffeeco/internal/store"
+	coffeeco "github.com/slf-aobrien/coffeeco/internal"
+	"github.com/slf-aobrien/coffeeco/internal/store"
 )
 
 type CoffeeBux struct {
@@ -28,7 +28,7 @@ func (c *CoffeeBux) AddStamp() {
 	}
 }
 
-func (c *CoffeeBux) Pay(ctx context.Context, purchases []purchase.Purchase) error {
+func (c *CoffeeBux) Pay(ctx context.Context, purchases []coffeeco.Product) error {
 	lp := len(purchases)
 	if lp == 0 {
 		return errors.New("nothing to buy")

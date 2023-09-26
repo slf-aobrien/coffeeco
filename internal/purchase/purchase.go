@@ -1,8 +1,6 @@
 package purchase
 
 import (
-	coffeeco "coffeeco/internal"
-	"coffeeco/internal/store"
 	"context"
 	"errors"
 	"fmt"
@@ -10,6 +8,11 @@ import (
 
 	"github.com/Rhymond/go-money"
 	"github.com/google/uuid"
+
+	coffeeco "github.com/slf-aobrien/coffeeco/internal"
+	"github.com/slf-aobrien/coffeeco/internal/loyalty"
+	"github.com/slf-aobrien/coffeeco/internal/payment"
+	"github.com/slf-aobrien/coffeeco/internal/store"
 )
 
 type Purchase struct {
@@ -17,8 +20,9 @@ type Purchase struct {
 	Store              store.Store
 	ProductsToPurchase []coffeeco.Product
 	total              money.Money
-	PaymentMeans       payment.PaymentMeans
+	PaymentMeans       payment.Means
 	timeOfPurchase     time.Time
+	CardToken          *string
 }
 
 func (p *Purchase) validateAndEnrich() error {
@@ -34,7 +38,7 @@ func (p *Purchase) validateAndEnrich() error {
 	if p.total.IsZero() {
 		return errors.New("likely mistake; purchase should neve be 0. Please validate")
 	}
-	pi.id = uuid.New()
+	p.id = uuid.New()
 	p.timeOfPurchase = time.Now()
 	return nil //nil error everything was good
 }
@@ -53,6 +57,10 @@ type StoreService interface {
 	GetStoreSpecificDiscount(ctx context.Context, storeID uuid.UUID) (float32, error)
 }
 
+func NewService(cardService CardChargeService, purchaseRepo Repository, storeService StoreService) *Service {
+	return &Service{cardService: cardService, purchaseRepo: purchaseRepo, storeService: storeService}
+}
+
 func (s Service) CompletePurchase(ctx context.Context, storeId uuid.UUID, purchase *Purchase, coffeeBuxCard *loyalty.CoffeeBux) error {
 	if err := purchase.validateAndEnrich(); err != nil {
 		return err
@@ -63,7 +71,7 @@ func (s Service) CompletePurchase(ctx context.Context, storeId uuid.UUID, purcha
 
 	switch purchase.PaymentMeans {
 	case payment.MEANS_CARD:
-		if err := s.cardService.ChargeCard(ctx, purchase.total, *purchase.cardToken); err != nil {
+		if err := s.cardService.ChargeCard(ctx, purchase.total, *purchase.CardToken); err != nil {
 			return errors.New("Card Charge failed, cancelling purchase")
 		}
 	case payment.MEANS_CASH:
@@ -87,7 +95,7 @@ func (s Service) CompletePurchase(ctx context.Context, storeId uuid.UUID, purcha
 
 func (s *Service) calculateStoreSpecificDiscount(ctx context.Context, storeId uuid.UUID, purchase *Purchase) error {
 
-	discount, err := s.storeService.GetStoreSpecificDiscount(ctx, storeID)
+	discount, err := s.storeService.GetStoreSpecificDiscount(ctx, storeId)
 	if err != nil && err != store.ErrNoDiscount {
 		return fmt.Errorf("failed to get discount: %w", err)
 	}

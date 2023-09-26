@@ -7,10 +7,10 @@ import (
 	"github.com/Rhymond/go-money"
 	"github.com/google/uuid"
 
-	coffeeco "coffeeco/internal"
-	"coffeeco/internal/payment"
-	"coffeeco/internal/purchase"
-	"coffeeco/internal/store"
+	coffeeco "github.com/slf-aobrien/coffeeco/internal"
+	"github.com/slf-aobrien/coffeeco/internal/payment"
+	"github.com/slf-aobrien/coffeeco/internal/purchase"
+	"github.com/slf-aobrien/coffeeco/internal/store"
 )
 
 func main() {
