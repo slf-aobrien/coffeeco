@@ -1,9 +1,10 @@
 package store
 
 import (
-	coffeeco "github.com/slf-aobrien/coffeeco/internal"
 	"context"
+
 	"github.com/google/uuid"
+	coffeeco "github.com/slf-aobrien/coffeeco/internal"
 )
 
 type Store struct {

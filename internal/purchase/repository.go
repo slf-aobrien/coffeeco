@@ -3,6 +3,7 @@ package purchase
 import (
 	"context"
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/Rhymond/go-money"
@@ -24,21 +25,24 @@ type MongoRepository struct {
 }
 
 type mongoPurchase struct {
-	id                 uuid.UUID
-	store              store.Store
-	productsToPurchase []coffeeco.Product
-	total              money.Money
-	paymentMeans       payment.Means
-	timeOfPurchase     time.Time
-	cardToken          *string
+	Id                 uuid.UUID
+	Store              store.Store
+	ProductsToPurchase []coffeeco.Product
+	Total              money.Money
+	PaymentMeans       payment.Means
+	TimeOfPurchase     time.Time
+	CardToken          *string
 }
 
 func NewMongoRepo(ctx context.Context, connectionString string) (*MongoRepository, error) {
+
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(connectionString))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create a mongo client: %w", err)
 	}
+
 	purchases := client.Database("coffeeco").Collection("purchases")
+
 	return &MongoRepository{
 		purchases: purchases,
 	}, nil
@@ -55,15 +59,24 @@ func (mr *MongoRepository) Store(ctx context.Context, purchase Purchase) error {
 
 // this is to decouple our purchase aggregate from the Mongo Implementation
 func toMongoPurchase(p Purchase) mongoPurchase {
-	return mongoPurchase{
-		id:                 p.id,
-		store:              p.Store,
-		productsToPurchase: p.ProductsToPurchase,
-		total:              p.total,
-		paymentMeans:       p.PaymentMeans,
-		timeOfPurchase:     p.timeOfPurchase,
-		cardToken:          p.CardToken,
+	mongoP := mongoPurchase{
+		Id:                 p.id,
+		Store:              p.Store,
+		ProductsToPurchase: p.ProductsToPurchase,
+		Total:              p.total,
+		PaymentMeans:       p.PaymentMeans,
+		TimeOfPurchase:     p.timeOfPurchase,
+		CardToken:          p.CardToken,
 	}
+	log.Println("\tpurchase.repository toMongoPurchase ")
+	log.Println("\tid: ", mongoP.Id)
+	log.Println("\tstore: ", mongoP.Store.ID)
+	log.Println("\tProductsToPurchase: ", mongoP.ProductsToPurchase[0].ItemName)
+	log.Println("\ttotal: ", mongoP.Total.Amount())
+	log.Println("\tPayment Means: ", mongoP.PaymentMeans)
+	log.Println("\tTime of Purchase: ", mongoP.TimeOfPurchase)
+	log.Println("\tCard Token: ", mongoP.CardToken)
+	return mongoP
 }
 
 func (mr *MongoRepository) Ping(ctx context.Context) error {

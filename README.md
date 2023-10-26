@@ -21,11 +21,19 @@ to
 #### Requirements
 * GoLang version: go version go1.20.2 windows/amd64  
 #### Notes
+
+### Testing
+### Running
+step 1) 
+Start the Mongo Container
+```
+docker compose up
+```
+step 2)
+Execute the code:
 ```
 go build cmd/main.go
 ```
-### Testing
-### Running
 
 ## Chapter Notes
 * Chapter 5 - Implement a charge service other than Strip (maybe square)

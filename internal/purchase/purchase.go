@@ -84,6 +84,7 @@ func (s Service) CompletePurchase(ctx context.Context, storeId uuid.UUID, purcha
 	default:
 		return errors.New("unknown payment type")
 	}
+
 	if err := s.purchaseRepo.Store(ctx, *purchase); err != nil {
 		return errors.New("failed to store purchase")
 	}
